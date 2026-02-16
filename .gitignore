@@ -1,3 +1,5 @@
-sdg.db
-__pycache__/
 venv/
+pycache/
+*.pyc
+.streamlit/
+sdg.db

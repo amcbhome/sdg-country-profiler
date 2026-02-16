@@ -59,3 +59,22 @@ JOIN sdg_indicator i ON i.indicator_id = f.indicator_id
 JOIN sdg_goal g      ON g.goal_id = i.goal_id
 JOIN dim_period p    ON p.period_id = f.period_id
 GROUP BY c.country_name, g.goal_id, g.title, p.year;
+
+-- Country value + Global average (per indicator per year)
+CREATE VIEW IF NOT EXISTS vw_indicator_with_avg AS
+SELECT
+    c.country_name,
+    g.goal_id,
+    i.indicator_code,
+    i.name AS indicator_name,
+    i.unit,
+    p.year,
+    f.value,
+    AVG(f.value) OVER (
+        PARTITION BY i.indicator_code, p.year
+    ) AS global_avg
+FROM fact_sdg_value f
+JOIN dim_country c   ON c.country_id = f.country_id
+JOIN sdg_indicator i ON i.indicator_id = f.indicator_id
+JOIN sdg_goal g      ON g.goal_id = i.goal_id
+JOIN dim_period p    ON p.period_id = f.period_id;
